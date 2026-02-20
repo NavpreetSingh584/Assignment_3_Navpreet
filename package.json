@@ -1,10 +1,10 @@
 {
   "scripts": {
-  "dev": "ts-node-dev src/server.ts",
-  "build": "tsc",
-  "start": "node dist/server.js",
-  "test": "jest"
-}
+    "dev": "ts-node-dev src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.ts",
+    "test": "jest"
+  },
   "dependencies": {
     "express": "^5.2.1",
     "firebase-admin": "^13.6.1",
