@@ -5,6 +5,7 @@ export interface Event {
   id: string;
   name: string;
   date: string; // ISO string
+  description: string;
   capacity: number;
   status?: string;
   category?: string;
