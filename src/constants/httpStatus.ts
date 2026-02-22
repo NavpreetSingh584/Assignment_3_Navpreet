@@ -6,6 +6,7 @@ export const HTTP_STATUS = {
     // Client error responses
     BAD_REQUEST: 400,
     NOT_FOUND: 404,
+    NO_CONTENT: 204,
 
     // Server error responses
     INTERNAL_SERVER_ERROR: 500,
