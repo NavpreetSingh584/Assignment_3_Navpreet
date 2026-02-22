@@ -72,7 +72,9 @@ export const getEventById = async (id: string): Promise<Event> => {
   );
 
   if (!doc) {
-    throw new Error(`Event with ID ${id} not found`);
+    const error: any = new Error(`Event with ID ${id} not found`);
+    error.status = 404;
+    throw error;
   }
 
   const data: DocumentData | undefined = doc.data();
@@ -94,7 +96,13 @@ export const updateEvent = async (
   id: string,
   eventData: UpdateEventInput
 ): Promise<Event> => {
-  const existingEvent: Event = await getEventById(id);
+  const existingEvent = await getEventById(id);
+
+  if (!existingEvent) {
+    const error: any = new Error(`Event with ID ${id} not found`);
+    error.status = 404;
+    throw error;
+  }
 
   const updatedEvent: Event = {
     ...existingEvent,
@@ -128,10 +136,12 @@ export const updateEvent = async (
  * Delete event
  */
 export const deleteEvent = async (id: string): Promise<void> => {
-  const existingEvent: Event = await getEventById(id);
+  const existingEvent = await getEventById(id);
 
   if (!existingEvent) {
-    throw new Error(`Event with ID ${id} not found`);
+    const error: any = new Error(`Event with ID ${id} not found`);
+    error.status = 404;
+    throw error;
   }
 
   await deleteDocument(COLLECTION, id);
