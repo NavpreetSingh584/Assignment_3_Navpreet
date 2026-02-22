@@ -1,4 +1,4 @@
-jest.mock("../config/firebaseConfig", () => ({
+jest.mock("../src/config/firebaseConfig", () => ({
   db: {
     collection: jest.fn(),
     doc: jest.fn(),
