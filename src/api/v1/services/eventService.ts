@@ -17,7 +17,7 @@ import {
 const COLLECTION: string = "events";
 
 /**
- * Retrieves all events
+ * Retrieve all events
  */
 export const getAllEvents = async (): Promise<Event[]> => {
   try {
@@ -29,8 +29,8 @@ export const getAllEvents = async (): Promise<Event[]> => {
       return {
         id: doc.id,
         ...data,
-        createdAt: data.createdAt.toDate(),
-        updatedAt: data.updatedAt.toDate(),
+        createdAt: data.createdAt?.toDate?.() ?? data.createdAt,
+        updatedAt: data.updatedAt?.toDate?.() ?? data.updatedAt,
       } as Event;
     });
 
@@ -41,7 +41,7 @@ export const getAllEvents = async (): Promise<Event[]> => {
 };
 
 /**
- * Creates a new event
+ * Create event
  */
 export const createEvent = async (
   eventData: CreateEventInput
@@ -63,7 +63,7 @@ export const createEvent = async (
 };
 
 /**
- * Retrieves a single event by ID
+ * Get event by ID
  */
 export const getEventById = async (id: string): Promise<Event> => {
   const doc: DocumentSnapshot | null = await getDocumentById(
@@ -80,15 +80,15 @@ export const getEventById = async (id: string): Promise<Event> => {
   const event: Event = {
     id: doc.id,
     ...data,
-    createdAt: data?.createdAt.toDate(),
-    updatedAt: data?.updatedAt.toDate(),
+    createdAt: data?.createdAt?.toDate?.() ?? data?.createdAt,
+    updatedAt: data?.updatedAt?.toDate?.() ?? data?.updatedAt,
   } as Event;
 
   return structuredClone(event);
 };
 
 /**
- * Updates an existing event
+ * Update event
  */
 export const updateEvent = async (
   id: string,
@@ -101,9 +101,11 @@ export const updateEvent = async (
     updatedAt: new Date(),
   };
 
-  // Manual partial update (demo-style requirement)
   if (eventData.name !== undefined)
     updatedEvent.name = eventData.name;
+
+  if (eventData.description !== undefined)
+    updatedEvent.description = eventData.description;
 
   if (eventData.date !== undefined)
     updatedEvent.date = eventData.date;
@@ -123,7 +125,7 @@ export const updateEvent = async (
 };
 
 /**
- * Deletes an event
+ * Delete event
  */
 export const deleteEvent = async (id: string): Promise<void> => {
   const existingEvent: Event = await getEventById(id);
