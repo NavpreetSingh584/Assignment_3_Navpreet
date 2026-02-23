@@ -1,6 +1,5 @@
 import {
   QuerySnapshot,
-  DocumentData,
   DocumentSnapshot,
 } from "firebase-admin/firestore";
 
@@ -20,24 +19,18 @@ const COLLECTION: string = "events";
  * Retrieve all events
  */
 export const getAllEvents = async (): Promise<Event[]> => {
-  try {
-    const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
+  const snapshot: QuerySnapshot = await getDocuments(COLLECTION);
 
-    const events: Event[] = snapshot.docs.map((doc) => {
-      const data: DocumentData = doc.data();
+  return snapshot.docs.map((doc) => {
+    const data = doc.data() as Omit<Event, "id">;
 
-      return {
-        id: doc.id,
-        ...data,
-        createdAt: data.createdAt?.toDate?.() ?? data.createdAt,
-        updatedAt: data.updatedAt?.toDate?.() ?? data.updatedAt,
-      } as Event;
-    });
-
-    return events;
-  } catch (error: unknown) {
-    throw error;
-  }
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt,
+      updatedAt: data.updatedAt,
+    };
+  });
 };
 
 /**
@@ -48,18 +41,21 @@ export const createEvent = async (
 ): Promise<Event> => {
   const now: Date = new Date();
 
-  const newEvent: Partial<Event> = {
+  const newEvent: Omit<Event, "id"> = {
     ...eventData,
     createdAt: now,
     updatedAt: now,
   };
 
-  const eventId: string = await createDocument<Event>(
+  const eventId: string = await createDocument<Omit<Event, "id">>(
     COLLECTION,
     newEvent
   );
 
-  return structuredClone({ id: eventId, ...newEvent } as Event);
+  return {
+    id: eventId,
+    ...newEvent,
+  };
 };
 
 /**
@@ -71,22 +67,18 @@ export const getEventById = async (id: string): Promise<Event> => {
     id
   );
 
-  if (!doc) {
+  if (!doc || !doc.exists) {
     const error: any = new Error(`Event with ID ${id} not found`);
     error.status = 404;
     throw error;
   }
 
-  const data: DocumentData | undefined = doc.data();
+  const data = doc.data() as Omit<Event, "id">;
 
-  const event: Event = {
+  return {
     id: doc.id,
     ...data,
-    createdAt: data?.createdAt?.toDate?.() ?? data?.createdAt,
-    updatedAt: data?.updatedAt?.toDate?.() ?? data?.updatedAt,
-  } as Event;
-
-  return structuredClone(event);
+  };
 };
 
 /**
@@ -98,51 +90,26 @@ export const updateEvent = async (
 ): Promise<Event> => {
   const existingEvent = await getEventById(id);
 
-  if (!existingEvent) {
-    const error: any = new Error(`Event with ID ${id} not found`);
-    error.status = 404;
-    throw error;
-  }
-
   const updatedEvent: Event = {
     ...existingEvent,
+    ...eventData,
     updatedAt: new Date(),
   };
 
-  if (eventData.name !== undefined)
-    updatedEvent.name = eventData.name;
+  // Remove undefined values before sending to Firestore
+  const cleanedData = Object.fromEntries(
+    Object.entries(updatedEvent).filter(([_, value]) => value !== undefined)
+  ) as Event;
 
-  if (eventData.description !== undefined)
-    updatedEvent.description = eventData.description;
+  await updateDocument<Event>(COLLECTION, id, cleanedData);
 
-  if (eventData.date !== undefined)
-    updatedEvent.date = eventData.date;
-
-  if (eventData.capacity !== undefined)
-    updatedEvent.capacity = eventData.capacity;
-
-  if (eventData.status !== undefined)
-    updatedEvent.status = eventData.status;
-
-  if (eventData.category !== undefined)
-    updatedEvent.category = eventData.category;
-
-  await updateDocument<Event>(COLLECTION, id, updatedEvent);
-
-  return structuredClone(updatedEvent);
+  return cleanedData;
 };
 
 /**
  * Delete event
  */
 export const deleteEvent = async (id: string): Promise<void> => {
-  const existingEvent = await getEventById(id);
-
-  if (!existingEvent) {
-    const error: any = new Error(`Event with ID ${id} not found`);
-    error.status = 404;
-    throw error;
-  }
-
+  await getEventById(id);
   await deleteDocument(COLLECTION, id);
 };

@@ -8,10 +8,10 @@ describe("Event Service", () => {
   const baseEvent = {
     name: "Test Event",
     description: "Test Description",
-    date: new Date().toISOString(),
+    date: new Date().toISOString(), 
     capacity: 10,
     category: "meetup",
-    status: "active",
+    status: "draft",
   };
 
   beforeEach(() => {
@@ -32,6 +32,7 @@ describe("Event Service", () => {
       .toHaveBeenCalled();
 
     expect(result.id).toBe("123");
+    expect(result.name).toBe(baseEvent.name);
   });
 
   // --------------------------
@@ -59,6 +60,7 @@ describe("Event Service", () => {
 
     expect(result.length).toBe(1);
     expect(result[0].id).toBe("1");
+    expect(result[0].name).toBe(baseEvent.name);
   });
 
   // --------------------------
@@ -68,6 +70,7 @@ describe("Event Service", () => {
 
     const mockDoc = {
       id: "1",
+      exists: true,
       data: () => ({
         ...baseEvent,
         createdAt: new Date(),
@@ -81,6 +84,7 @@ describe("Event Service", () => {
     const result = await service.getEventById("1");
 
     expect(result.id).toBe("1");
+    expect(result.name).toBe(baseEvent.name);
   });
 
   // --------------------------
@@ -90,6 +94,7 @@ describe("Event Service", () => {
 
     const mockDoc = {
       id: "1",
+      exists: true,
       data: () => ({
         ...baseEvent,
         createdAt: new Date(),
@@ -115,6 +120,7 @@ describe("Event Service", () => {
 
     const mockDoc = {
       id: "1",
+      exists: true,
       data: () => ({
         ...baseEvent,
         createdAt: new Date(),

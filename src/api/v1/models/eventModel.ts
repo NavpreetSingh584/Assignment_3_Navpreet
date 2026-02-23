@@ -4,7 +4,7 @@
 export interface Event {
   id: string;
   name: string;
-  date: string; // ISO string
+  date: string; // stored as ISO string
   description: string;
   capacity: number;
   status?: string;
@@ -16,7 +16,14 @@ export interface Event {
 /**
  * Input type for creating a new event
  */
-export type CreateEventInput = Omit<Event, "id" | "createdAt" | "updatedAt">;
+export type CreateEventInput = {
+  name: string;
+  description: string;
+  date: string; // must be string (ISO date)
+  capacity: number;
+  status?: string;
+  category?: string;
+};
 
 /**
  * Input type for updating an event
