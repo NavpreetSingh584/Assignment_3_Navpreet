@@ -32,11 +32,11 @@ export const eventSchemas: Record<string, RequestSchema> = {
         "string.isoDate": "Date must be a valid ISO date",
       }),
 
-      capacity: Joi.number().integer().min(1).max(1000).required().messages({
+      capacity: Joi.number().integer().min(6).max(1000).required().messages({
         "any.required": "Capacity is required",
         "number.base": "Capacity must be a number",
         "number.integer": "Capacity must be an integer",
-        "number.min": "Capacity must be at least 1",
+        "number.min": "Capacity must be at least {#limit}",
         "number.max": "Capacity must be at most 1000",
       }),
 
@@ -89,10 +89,10 @@ export const eventSchemas: Record<string, RequestSchema> = {
         "string.isoDate": "Date must be a valid ISO date",
       }),
 
-      capacity: Joi.number().integer().min(1).max(1000).optional().messages({
+      capacity: Joi.number().integer().min(6).max(1000).optional().messages({
         "number.base": "Capacity must be a number",
         "number.integer": "Capacity must be an integer",
-        "number.min": "Capacity must be at least 1",
+        "number.min": "Capacity must be at least {#limit}",
         "number.max": "Capacity must be at most 1000",
       }),
 
